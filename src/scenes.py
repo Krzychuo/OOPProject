@@ -37,10 +37,11 @@ class GameScene(SceneBase):
         self._clickables = GameSceneClickables()
         self._scene_manager = manager
         self.__observer = Observer()
-        self.__observer.subscribe("update_selected", self.update_selected)
         self.__observer.subscribe("move_piece", self.move_piece)
         self.__observer.subscribe("remove_piece", self.remove_piece)
         self.__observer.subscribe("win_animation", self.win_animation)
+        self.__observer.subscribe("mark_pieces", self.mark_pieces)
+        self.__observer.subscribe("unmark_pieces", self.unmark_pieces)
 
     def process_input(self, events):
         for event in events:
@@ -56,12 +57,6 @@ class GameScene(SceneBase):
             for sprite in layer:
                 if sprite.is_active() and sprite.get_image():
                     screen.blit(sprite.get_image(), sprite.get_rect())
-                    
-    def update_selected(self, board_pos):
-        for sprite in self._renderables[4]:
-                sprite.deactivate()
-        if board_pos != None:
-            self._renderables[4][board_pos].activate()
 
     def get_dot_pos(self, board_pos):
         return self._renderables[1][board_pos].get_rect().center
@@ -82,10 +77,17 @@ class GameScene(SceneBase):
     def win_animation(self):
         t = Thread(target=self._win_animation_thread)
         t.start()
-        #t.join()
 
     def _win_animation_thread(self):
-        sleep(3)
+        sleep(2)
         for i in range(0, 9):
             self._renderables[2][i].reset()
             self._renderables[3][i].reset()
+
+    def mark_pieces(self, pos_list):
+        for pos in pos_list:
+            self._renderables[4][pos].activate()
+
+    def unmark_pieces(self):
+        for sprite in self._renderables[4]:
+            sprite.deactivate()

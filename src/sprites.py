@@ -60,7 +60,7 @@ class Piece(Sprite):
         self.set_position(pos)
 
     def move_to(self, pos):
-        anim = self.__animation_manager.create_animation(self._rect, 'center', self._rect.center, pos, 0.6)
+        anim = self.__animation_manager.create_animation(self._rect, 'center', self._rect.center, pos, 0.4)
         anim.play()
 
     def reset(self):

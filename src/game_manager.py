@@ -87,6 +87,7 @@ class GameManager:
                     self.add_piece()
                     if self._board.check_mill(board_pos):
                         self._state = 1
+                        self.__observer.notify("mark_pieces", pos_list=self._board.get_enemy_pos_list(self.get_player_color()))
                     else:
                         self.switch_player()
             else:
@@ -99,16 +100,26 @@ class GameManager:
                         self._board.move(self._selected_piece, board_pos)
                         if self._board.check_mill(board_pos):
                             self._state = 1
+                            self._selected_piece = None
+                            self.__observer.notify("unmark_pieces")
+                            self.__observer.notify("mark_pieces", pos_list=self._board.get_enemy_pos_list(self.get_player_color()))
                         else:
                             self.switch_player()
-                    self._selected_piece = None
+                            self._selected_piece = None
+                            self.__observer.notify("unmark_pieces")
+                    else:
+                        self._selected_piece = None
+                        self.__observer.notify("unmark_pieces")
                 elif self._board.is_enemy(board_pos, self.get_player_color()):
                     self._selected_piece = None
+                    self.__observer.notify("unmark_pieces")
                 else:
                     if self._selected_piece == board_pos:
                         self._selected_piece = None
+                        self.__observer.notify("unmark_pieces")
                     else:
                         self._selected_piece = board_pos
+                        self.__observer.notify("mark_pieces", pos_list=[self._selected_piece])
         else:
             if self._board.is_enemy(board_pos, self.get_player_color()):
                 self.switch_player()
@@ -118,9 +129,11 @@ class GameManager:
                 self.remove_piece()
                 self._board.remove(board_pos)
                 self._state = 0
+                self.__observer.notify("unmark_pieces")
                 if self.get_pieces() == 2 and self.get_reserve() == 0:
                     self.__observer.notify("win_animation")
                     self.__lock = True
                     self.reset_game()
+                    self.__observer.notify("unmark_pieces")
                     
-        self.__observer.notify("update_selected", board_pos=self._selected_piece)
+        

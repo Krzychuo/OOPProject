@@ -46,7 +46,7 @@ class Board():
         for i in range(0, 26, 2):
             
                 if i%8 == 6:
-                    if board_pos == i or board_pos == i+1 or board_pos == i-6:
+                    if board_pos in [i, i+1, i-6]:
                         if self.sgn(self.get_piece(i)) == self.sgn(self.get_piece(i+1)) == self.sgn(self.get_piece(i-6)):
                             return True
                 else:
@@ -60,3 +60,11 @@ class Board():
                 return True
             
         return False
+    
+    def get_enemy_pos_list(self, col):
+        col *= -1
+        ret = []
+        for i in range(0, 24):
+            if self.sgn(self.get_piece(i)) == col:
+                ret.append(i)
+        return ret
