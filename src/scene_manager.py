@@ -11,13 +11,13 @@ class SceneManager:
         return cls._instance
     
     def _init(self):
-        self.screen = pygame.display.set_mode((800, 800))
+        self._screen = pygame.display.set_mode((800, 800))
         pygame.display.set_caption("Nine men's morris")
-        self.scenes = {
-            "title_scene" : TitleScene(),
-            "game_scene" : GameScene()
+        self._scenes = {
+            "title_scene" : TitleScene(self),
+            "game_scene" : GameScene(self)
         }
-        self.current_scene = self.scenes["game_scene"]
+        self._current_scene = self._scenes["game_scene"]
 
     def heartbeat(self, events):
         for event in events:
@@ -25,8 +25,8 @@ class SceneManager:
                 pygame.quit()
                 sys.exit()
 
-        self.current_scene.process_input(None, None)
-        self.current_scene.update()
-        self.current_scene.render(self.screen)
+        self._current_scene.process_input(None, None)
+        self._current_scene.update()
+        self._current_scene.render(self._screen)
 
         pygame.display.flip()
