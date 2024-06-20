@@ -1,5 +1,26 @@
 import pygame
-from sprite import Sprite
+
+class Sprite(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self._image = None 
+        self._rect = None
+        self._active = False
+
+    def get_image(self):
+        return self._image
+
+    def get_rect(self):
+        return self._rect
+    
+    def is_active(self):
+        return self._active
+    
+    def set_position(self, pos):
+        self._rect.center = pos
+
+    def move_to(self, pos):
+        self.set_position(pos)
 
 class BoardDot(Sprite):
     def __init__(self, pos, active=True):
@@ -31,3 +52,18 @@ class Piece(Sprite):
         self._rect = self._image.get_rect()
         self._active = active
         self.set_position(pos)
+
+class SelectedDot(Sprite):
+    def __init__(self, pos):
+        super().__init__()
+        self._image = pygame.Surface((14, 14), pygame.SRCALPHA)
+        pygame.draw.circle(self._image, (255, 0, 0), (7, 7), 7)
+        self._rect = self._image.get_rect()
+        self._active = False
+        self.set_position(pos)
+
+    def deactivate(self):
+        self._active = False
+    
+    def activate(self):
+        self._active = True
