@@ -1,7 +1,6 @@
 from observer import Observer
 from board import Board
 from player import Player
-import time
 
 class GameManager:
     _instance = None
