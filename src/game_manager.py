@@ -1,7 +1,7 @@
-import pygame
 from observer import Observer
 from board import Board
 from player import Player
+import time
 
 class GameManager:
     _instance = None
@@ -15,6 +15,9 @@ class GameManager:
         self.reset_game()
         self.__observer = Observer()
         self.__observer.subscribe("click_position", self.click_position)
+        self.__observer.subscribe("all_animations_finished", self.unlock)
+        self.__observer.subscribe("animation_played", self.lock)
+        self.__lock = False
 
     def reset_game(self):
         self._player1 = Player(1)
@@ -65,7 +68,14 @@ class GameManager:
         else:
             self._black_pieces -= 1
 
+    def unlock(self):
+        self.__lock = False
+
+    def lock(self):
+        self.__lock = True
+
     def click_position(self, board_pos):
+        if self.__lock: return
         if self._state == 0:
             if self.get_reserve() > 0:
                 if self._board.is_clear(board_pos):
@@ -81,7 +91,8 @@ class GameManager:
                         self.switch_player()
             else:
                 if self._board.is_clear(board_pos):
-                    if self._selected_piece != None and self._board.is_valid_move(self._selected_piece, board_pos):
+                    if self._selected_piece != None and \
+                        (self._board.is_valid_move(self._selected_piece, board_pos) or self.get_pieces() <= 3):
                         self.__observer.notify("move_piece", 
                                                piece_idx=self._board.get_piece(self._selected_piece), 
                                                board_pos=board_pos)
@@ -107,4 +118,9 @@ class GameManager:
                 self.remove_piece()
                 self._board.remove(board_pos)
                 self._state = 0
+                if self.get_pieces() == 2 and self.get_reserve() == 0:
+                    self.__observer.notify("win_animation")
+                    self.__lock = True
+                    self.reset_game()
+                    
         self.__observer.notify("update_selected", board_pos=self._selected_piece)

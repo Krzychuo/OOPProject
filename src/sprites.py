@@ -1,4 +1,6 @@
 import pygame
+from observer import Observer
+from animation_manager import AnimationManager
 
 class Sprite(pygame.sprite.Sprite):
     def __init__(self):
@@ -15,6 +17,9 @@ class Sprite(pygame.sprite.Sprite):
     
     def is_active(self):
         return self._active
+
+    def get_position(self):
+        return self._rect.center
     
     def set_position(self, pos):
         self._rect.center = pos
@@ -43,15 +48,24 @@ class BoardLine(Sprite):
         self.set_position(((x+x2)/2, (y+y2)/2))
 
 class Piece(Sprite):
-    # ONE PIECE IS REAL
     def __init__(self, pos, color, color2, active=True):
         super().__init__()
-        self._image = pygame.Surface((80, 80), pygame.SRCALPHA)
-        pygame.draw.circle(self._image, color, (40, 40), 30)
-        pygame.draw.circle(self._image, color2, (40, 40), 15)
+        self._image = pygame.Surface((60, 60), pygame.SRCALPHA)
+        pygame.draw.circle(self._image, color, (30, 30), 30)
+        pygame.draw.circle(self._image, color2, (30, 30), 15)
         self._rect = self._image.get_rect()
         self._active = active
+        self._origin = pos
+        self.__animation_manager = AnimationManager()
         self.set_position(pos)
+
+    def move_to(self, pos):
+        anim = self.__animation_manager.create_animation(self._rect, 'center', self._rect.center, pos, 0.6)
+        anim.play()
+
+    def reset(self):
+        anim = self.__animation_manager.create_animation(self._rect, 'center', self._rect.center, self._origin, 1.2)
+        anim.play()
 
 class SelectedDot(Sprite):
     def __init__(self, pos):
@@ -67,3 +81,13 @@ class SelectedDot(Sprite):
     
     def activate(self):
         self._active = True
+
+class BoardRing(Sprite):
+    def __init__(self, pos, color, color2, active=True):
+        super().__init__()
+        self._image = pygame.Surface((80, 80), pygame.SRCALPHA)
+        pygame.draw.circle(self._image, color, (40, 40), 35)
+        pygame.draw.circle(self._image, color2, (40, 40), 30)
+        self._rect = self._image.get_rect()
+        self._active = active
+        self.set_position(pos)

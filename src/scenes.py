@@ -1,6 +1,8 @@
 from sprites import *
 from scene_sprites import *
 from observer import Observer
+from threading import Thread
+from time import sleep
 
 class SceneBase:
     def __init__(self, manager):
@@ -38,6 +40,7 @@ class GameScene(SceneBase):
         self.__observer.subscribe("update_selected", self.update_selected)
         self.__observer.subscribe("move_piece", self.move_piece)
         self.__observer.subscribe("remove_piece", self.remove_piece)
+        self.__observer.subscribe("win_animation", self.win_animation)
 
     def process_input(self, events):
         for event in events:
@@ -55,23 +58,34 @@ class GameScene(SceneBase):
                     screen.blit(sprite.get_image(), sprite.get_rect())
                     
     def update_selected(self, board_pos):
-        for sprite in self._renderables[3]:
+        for sprite in self._renderables[4]:
                 sprite.deactivate()
         if board_pos != None:
-            self._renderables[3][board_pos].activate()
+            self._renderables[4][board_pos].activate()
 
     def get_dot_pos(self, board_pos):
-        return self._renderables[0][board_pos].get_rect().center
+        return self._renderables[1][board_pos].get_rect().center
 
     def move_piece(self, piece_idx, board_pos):
-        idx = 1 if piece_idx > 0 else 2
+        idx = 2 if piece_idx > 0 else 3
         piece_idx = abs(piece_idx) - 1
         self._renderables[idx][piece_idx].move_to(self.get_dot_pos(board_pos))
 
     def remove_piece(self, removed_idx, piece_idx):
-        idx = 1 if piece_idx > 0 else 2
+        idx = 2 if piece_idx > 0 else 3
         piece_idx = abs(piece_idx) - 1
-        if idx == 1:
+        if idx == 2:
             self._renderables[idx][piece_idx].move_to((800-100*removed_idx, 100))
         else:
             self._renderables[idx][piece_idx].move_to((200+100*removed_idx, 900))
+
+    def win_animation(self):
+        t = Thread(target=self._win_animation_thread)
+        t.start()
+        #t.join()
+
+    def _win_animation_thread(self):
+        sleep(3)
+        for i in range(0, 9):
+            self._renderables[2][i].reset()
+            self._renderables[3][i].reset()

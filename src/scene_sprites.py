@@ -13,6 +13,16 @@ class GameSceneRenderables:
 
         new_layer()
 
+        for x in range(100, 1000, 100):
+            add(BoardRing((x, 100),(88, 57, 39),(205, 127, 50)))
+            add(BoardRing((x, 900),(88, 57, 39),(205, 127, 50)))
+
+        for y in range(200, 900, 100):
+            add(BoardRing((100, y),(88, 57, 39),(205, 127, 50)))
+            add(BoardRing((900, y),(88, 57, 39),(205, 127, 50)))
+
+        new_layer()
+
         for offset in [300, 200, 100]:
             for delta in [(-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0)]:
                     add(BoardDot((500+offset*delta[0], 500+offset*delta[1])))

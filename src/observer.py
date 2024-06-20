@@ -7,13 +7,19 @@ class Observer:
         return cls._instance
 
     def _init(self):
-        self.subscribtions = {}
+        self.__subscriptions = {}
 
     def subscribe(self, name, obj):
-        if not name in self.subscribtions:
-            self.subscribtions[name] = []
-        self.subscribtions[name].append(obj)
+        if not name in self.__subscriptions:
+            self.__subscriptions[name] = []
+        self.__subscriptions[name].append(obj)
     
     def notify(self, name, **kwargs):
-        for subscriber in self.subscribtions[name]:
+        for subscriber in self.__subscriptions[name]:
             subscriber(**kwargs)
+
+    def remove(self, name):
+        if name in self.__subscriptions:
+            del self.__subscriptions
+        else:
+            raise KeyError(f"No event with name {name}")
